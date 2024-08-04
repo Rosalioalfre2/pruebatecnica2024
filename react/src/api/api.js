@@ -28,7 +28,6 @@ const limpiarJSON = (json, update=false) =>{
 
 const handlerApi = (ruta, opcion, data)=> {
   let queryGetBy = "";
-
   if (data?.getBy != undefined && data?.getBy?.length > 0) {
     data.getBy.forEach((element) => {
       queryGetBy +=
@@ -62,7 +61,7 @@ const handlerApi = (ruta, opcion, data)=> {
       response = axiosApi.patch(`${ruta}/${data?.id}/`, { ...cleanData });
       break;
     case "delete":
-      // response = axiosApi.delete(`${ruta}/${data?.id}/`);
+      response = axiosApi.delete(`${ruta}/${data?.id}/`);
       break;
     case "create":
       response = axiosApi.post(`${ruta}/`, { ...cleanData });

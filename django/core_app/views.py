@@ -36,6 +36,7 @@ class LoginView(APIView):
         refresh['email'] = user.email
         refresh['date'] = str(datetime.date.today())
         refresh['groups'] = json_grupos
+        refresh['is_admin'] = user.is_superuser
 
         response = Response()
         response.data = {

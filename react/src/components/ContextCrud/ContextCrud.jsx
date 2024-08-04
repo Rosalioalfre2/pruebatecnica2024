@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { notify } from "@/components/toast";
 import { Label, TextInput, Button, Select } from "flowbite-react";
 import { Pagination } from '@nextui-org/react'
-import { useEnterprise } from "@/context/LocationContext";
 import {Alert} from 'flowbite-react'
 import { Viewer } from "@/components/ui/Viewer";
 import { useCrud } from "./Context";
@@ -16,7 +15,7 @@ const ContextCrud = ({
   baseColumns,
   filtros,
   getBy = [],
-  tenant = false,
+  // tenant = false,
   showActionsColumn = true,
   actionColumnsValidation = true,
   showAddButton = true,
@@ -55,7 +54,6 @@ const ContextCrud = ({
     setLoadingForm,
   } = useCrud();
 
-  const { empresa } = useEnterprise();
   const [loadingPag, setLoadingPag] = useState(false)
 
   const toogleModal = (resetear = false) => {
@@ -70,11 +68,7 @@ const ContextCrud = ({
   const onSubmit = handleSubmit(async (data) => {
     setAlerta({warnings: [], errors: []})
 
-    if (tenant && empresa.tenant == "") {
-      notify("Seleccione una empresa!!!", "error");
-      return;
-    }
-    data.tenant = tenant ? empresa.tenant : "";
+    data.tenant = "";
     try {
       setLoadingForm(true)
       if (data.id !== undefined) {
@@ -140,14 +134,9 @@ const ContextCrud = ({
   });
 
   const deleteById = async (id) => {
-    if (tenant && empresa.tenant == "") {
-      notify("Seleccione una empresa!!!", "error");
-      return;
-    }
     try {
       const response = await handlerApi(ruta, "delete", {
         id,
-        tenant: tenant ? empresa.tenant : "",
       });
       if (response.status != 204) {
         notify("Algo salió mal al intentar eliminar este registro.", "error");
@@ -175,17 +164,12 @@ const ContextCrud = ({
   };
 
   const loadObjects = async () => {
-    if (tenant && empresa.tenant == "") {
-      notify("Seleccione una empresa!!!", "error");
-      return;
-    }
     try {
       setLoadingPag(true)
       const response = await handlerApi(ruta, "getPag", {
         page: pagination.currentPage,
         page_size: pagination.items,
         filtro: filtro,
-        tenant: tenant ? empresa.tenant : "",
         getBy,
       });
       setPagination({
@@ -210,7 +194,7 @@ const ContextCrud = ({
 
   useEffect(() => {
     loadObjects();
-  }, [pagination.currentPage, pagination.items, filtro, empresa]);
+  }, [pagination.currentPage, pagination.items, filtro]);
 
   useEffect(() => {
     if(reload != 0){

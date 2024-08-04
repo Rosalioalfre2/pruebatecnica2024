@@ -4,13 +4,14 @@ import App from './App.jsx'
 import { Flowbite } from "flowbite-react";
 import { AlertProvider } from "./context/AlertContext";
 import { NextUIProvider } from "@nextui-org/react";
+import theme from "./flowbite-theme";
 import './index.css'
 import { AuthProvider } from "@/context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <NextUIProvider>
-      <Flowbite>
+      <Flowbite theme={{theme}}>
         <AlertProvider>
           <AuthProvider>
             <App />

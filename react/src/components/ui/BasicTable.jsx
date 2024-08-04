@@ -26,7 +26,7 @@ const BasicTable = ({
 
   if (typeof showActionsColumn == "boolean") {
     actionColumns = showActionsColumn
-      ? { edit: true, delete: true }
+      ? { edit: true, delete: false }
       : { edit: false, delete: false };
   } else {
     actionColumns = showActionsColumn;
@@ -79,22 +79,30 @@ const BasicTable = ({
                         <FaTrashAlt />
                       </Button>
                     )}
-                  {actionColumnsValidation?.delete &&
-                    ((actionColumnsValidation.delete.type == "=" &&
-                      row.cell.row.original[
-                        actionColumnsValidation.delete.name
-                      ] == actionColumnsValidation.delete.value) ||
-                      (actionColumnsValidation.delete.type == "!=" &&
+                    {/* {actionColumnsValidation?.delete &&
+                      ((actionColumnsValidation.delete.type == "=" &&
                         row.cell.row.original[
                           actionColumnsValidation.delete.name
-                        ] != actionColumnsValidation.delete.value)) && (
-                      <Button
-                        color="failure"
-                        onClick={() => deleteObject(row.cell.row.original.id)}
-                      >
-                        <FaTrashAlt />
-                      </Button>
-                    )}
+                        ] == actionColumnsValidation.delete.value) ||
+                        (actionColumnsValidation.delete.type == "!=" &&
+                          row.cell.row.original[
+                            actionColumnsValidation.delete.name
+                          ] != actionColumnsValidation.delete.value)) && (
+                        <Button
+                          color="failure"
+                          onClick={() => deleteObject(row.cell.row.original.id)}
+                        >
+                          <FaTrashAlt />
+                        </Button>
+                      )} */}
+                      {actionColumns?.delete == true && (
+                          <Button
+                            color="failure"
+                            onClick={() => deleteObject(row.cell.row.original.id)}
+                          >
+                            <FaTrashAlt />
+                          </Button>
+                        )}
                   {masAcciones}
                 </div>
               </>

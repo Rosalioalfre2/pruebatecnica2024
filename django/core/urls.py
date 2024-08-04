@@ -9,5 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("docs/", include_docs_urls(title="Documentacion")),
     path('auth/', include('core_app.urls')),
+    path('finanza/', include('finanzas.urls')),
 ]
 
