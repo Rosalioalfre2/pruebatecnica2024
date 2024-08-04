@@ -17,3 +17,21 @@ class TipoAhorroSerializer(serializers.ModelSerializer):
     def get_nombre_tipo_meta(self, obj):
         if obj.tipo_meta:
             return obj.tipo_meta.nombre
+
+class OrigenMovimientoSerializer(serializers.ModelSerializer):
+    class Meta:
+        from finanzas.models import OrigenMovimiento
+        model = OrigenMovimiento
+        fields = '__all__'
+
+class TipoMovimientoSerializer(serializers.ModelSerializer):
+    nombre_origen = serializers.SerializerMethodField()
+    
+    class Meta:
+        from finanzas.models import TipoMovimiento
+        model = TipoMovimiento
+        fields = '__all__'
+    
+    def get_nombre_origen(self, obj):
+        if obj.origen:
+            return obj.origen.nombre

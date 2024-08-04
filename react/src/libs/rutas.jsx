@@ -4,6 +4,10 @@ import { TbPigMoney } from "react-icons/tb";
 // Rutas de admin
 import {TipoMeta} from '@/pages/admin/TipoMeta'
 import { TipoAhorro } from "@/pages/admin/TipoAhorro";
+import { OrigenMovimiento } from "@/pages/admin/OrigenMovimiento";
+import { LuMove3D } from "react-icons/lu";
+import { TipoMovimiento } from "@/pages/admin/TipoMovimiento";
+import { FaArrowsUpDown } from "react-icons/fa6";
 
 let routesItems = [];
 
@@ -21,10 +25,22 @@ const adminRutas = [
         children: <TipoMeta />,
       },
       {
+        to: "tipo_movimiento",
+        label: "Tipos de movimientos",
+        icon: FaArrowsUpDown,
+        children: <TipoMovimiento tipo="admin" />,
+      },
+      {
         to: "tipo_ahorro",
         label: "Tipos de ahorros",
         icon: TbPigMoney,
         children: <TipoAhorro tipo="admin" />,
+      },
+      {
+        to: "origen_movimiento",
+        label: "Origen movimiento",
+        icon: LuMove3D,
+        children: <OrigenMovimiento />,
       },
     ],
   },
@@ -41,6 +57,12 @@ const userConfig = [
         label: "Tipos de ahorros",
         icon: TbPigMoney,
         children: <TipoAhorro />,
+      },
+      {
+        to: "tipo_movimiento",
+        label: "Tipos de movimientos",
+        icon: FaArrowsUpDown,
+        children: <TipoMovimiento />,
       },
     ],
   },

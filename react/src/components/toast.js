@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 
 const darkTopRight = {
+  position:"bottom-right",
   autoClose: 4000,
   hideProgressBar: false,
   closeOnClick: true,

@@ -6,6 +6,8 @@ router = routers.DefaultRouter()
 # RUTAS DEL API REST DE EMPLEADO
 router.register( r'TipoMeta', views.TipoMetaView, 'TipoMeta')
 router.register( r'TipoAhorro', views.TipoAhorroView, 'TipoAhorro')
+router.register( r'TipoMovimiento', views.TipoMovimientoView, 'TipoMovimiento')
+router.register( r'OrigenMovimiento', views.OrigenMovimientoView, 'OrigenMovimiento')
 
 # EL RESTO DE RUTAS
 urlpatterns = [

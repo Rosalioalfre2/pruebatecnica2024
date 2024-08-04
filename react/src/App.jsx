@@ -9,10 +9,14 @@ import NotFound from "./components/pages/NotFound";
 import ServerError from "./components/pages/ServerError";
 import Unauthorized from "./components/pages/Unauthorized";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
 
   return (
     <>
+      <ToastContainer />
       <BrowserRouter>
         <Routes>
           <Route
