@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import  DjangoModelPermissions, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db import transaction
+import finanzas.const as Finanza
 
 
 class Homeview(APIView):
@@ -49,11 +51,38 @@ class LoginView(APIView):
         return response
 
 class RegisterView(APIView):
+    @transaction.atomic
     def post(self, request):
+        from finanzas.models import TipoAhorro, Ahorro
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            
+            tipo_ahorro = TipoAhorro.objects.get(id=Finanza.ta_apertura)
+            
+            ahorro = Ahorro(
+                usuario=user,
+                nombre="Cuenta principal",
+                cantidad=0,
+                tipo_ahorro=tipo_ahorro
+            )
+            
+            try:
+                ahorro.save()
+                response_data = {
+                    'user': serializer.data,
+                    'ahorro': {
+                        'id': ahorro.id,
+                        'usuario_id': ahorro.usuario.id,
+                        'nombre': ahorro.nombre,
+                        'cantidad': ahorro.cantidad,
+                        'tipo_ahorro_id': ahorro.tipo_ahorro.id,
+                    }
+                }
+                return Response(response_data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SimpleLogoutView(APIView):

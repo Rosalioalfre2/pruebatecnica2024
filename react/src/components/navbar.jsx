@@ -29,7 +29,7 @@ const ExampleNavbar = ({
 
   return (
     <Navbar
-      className="rounded-b-xl bg-blue-800"
+      className="rounded-b-xl bg-slate-800"
       fluid
     >
       <div className="w-full p-3 lg:px-5 lg:pl-3">

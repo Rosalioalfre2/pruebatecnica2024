@@ -1,27 +1,26 @@
+import { GiStairsGoal } from "react-icons/gi";
+
 let routesItems = [];
 
 
-const compras = [
+const adminRutas = [
   {
-    label: "Compras",
-    identifier: "compras",
-    roles: ["compras"],
+    label: "Administrador",
+    identifier: "admin",
+    roles: ["admin",],
     items: [
       {
-        to: "#",
-        label: "Estatus de contenedores",
-        empresa: [3],
-      },
-      {
-        to: "#",
-        label: "Requirimiento de suministro de tiendas",
+        to: "tipo_metas",
+        label: "Tipos de metas",
+        icon: GiStairsGoal,
+        children: <></>,
       },
     ],
   },
 ];
 
 routesItems = [
-  ...compras,
+  ...adminRutas,
 ];
 
 export { routesItems };

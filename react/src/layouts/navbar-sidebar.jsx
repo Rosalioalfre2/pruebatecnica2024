@@ -154,7 +154,7 @@ const MainContentFooter= function () {
   const year = new Date().getFullYear();
   return (
     <>
-      <Footer container className="bg-blue-800">
+      <Footer container className="bg-slate-800">
         <div className="flex w-full flex-col gap-y-6 lg:flex-row lg:justify-between lg:gap-y-0">
           <Footer.LinkGroup className="text-white">
             <Footer.Link href="#" className="mb-3 mr-3 lg:mb-0">

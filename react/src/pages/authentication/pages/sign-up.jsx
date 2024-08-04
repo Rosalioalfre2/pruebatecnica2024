@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { axiosPublic } from "@/libs/axios";
-// import { notify } from "@/components/toast";
+import { notify } from "@/components/toast";
 import { useNavigate } from "react-router-dom";
 import { HiInformationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
@@ -28,22 +28,27 @@ const SignUpPage = function () {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await axiosPublic.post("/auth/register", {
+      const response = await axiosPublic.post("/auth/register/", {
         email: data.email,
         username: data.username,
         password: data.password,
       });
-      if (response.status === 200) {
+      if (response.status === 201) {
         navigate("/authentication/sign-in");
       }
     } catch (error) {
-      setHelpBanner(JSON.stringify(error.response.data, null, 2));
+      // setHelpBanner(JSON.stringify(error.response.data, null, 2));
       Object.entries(error.response.data).forEach(([key, value]) => {
+        if(! key.includes('username','email','password')){
+          return;
+        }
+        
         setError(key, {
-          type: "validate",
+          type: "custom",
           message: JSON.stringify(value, null, 2),
         });
       });
+      notify("Ooops, vuelve a intentarlo.")
     }
   });
 

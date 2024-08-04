@@ -29,7 +29,7 @@ const SignInPage= function () {
   return (
     <div className="dark flex h-4/5 min-h-screen flex-col items-center justify-center gap-y-4 bg-black px-4">
       <div
-        className="my-2 flex w-full items-center justify-center gap-x-1 py-4 md:my-0 lg:my-0 lg:max-w-[80%] bg-blue-800"
+        className="my-2 flex w-full items-center justify-center gap-x-1 py-4 md:my-0 lg:my-0 lg:max-w-[80%] bg-slate-800"
       >
       </div>
       <Card
@@ -122,7 +122,7 @@ const SignInPage= function () {
         </form>
       </Card>
       <div
-        className="mb-3 w-full py-4 sm:mb-0 lg:max-w-[80%] bg-blue-800"
+        className="mb-3 w-full py-4 sm:mb-0 lg:max-w-[80%] bg-slate-800"
       ></div>
     </div>
   );

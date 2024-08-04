@@ -1,3 +1,6 @@
 from django.contrib import admin
+from core_app.models import User
 
-# Register your models here.
+@admin.register(User)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ['username']
