@@ -6,6 +6,7 @@ import { FormCuenta } from './components/FormCuenta';
 
 const Cuentas = () => {
   const [cuentas, setCuentas] = useState([]);
+  const [actualiza, setActualiza] = useState(0)
 
   useEffect(() => {
     const fetchCuentas = async () => {
@@ -16,7 +17,7 @@ const Cuentas = () => {
     };
 
     fetchCuentas();
-  }, []);
+  }, [actualiza]);
 
   return (
     <Container className="space-y-2">
@@ -27,7 +28,7 @@ const Cuentas = () => {
       </Row>
       <Row>
         <Col>
-          <FormCuenta />
+          <FormCuenta actualiza={actualiza} setActualiza={setActualiza} />
         </Col>
       </Row>
       <Row>
@@ -38,7 +39,7 @@ const Cuentas = () => {
         ) : (
           cuentas.map((cuenta, index) => (
             <Col key={index} className="p-4">
-              <CuentaCard cuenta={cuenta} />
+              <CuentaCard cuenta={cuenta} actualiza={actualiza} setActualiza={setActualiza} />
             </Col>
           ))
         )}

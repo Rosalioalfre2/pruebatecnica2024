@@ -188,3 +188,5 @@ class CuentasApiView(APIView):
             return JsonResponse(cuenta.getCuentas(), safe=False)
         elif option == "addCuenta":
             return JsonResponse(cuenta.addCuenta(self.request.data, user_id), safe=False)
+        elif option == "deleteCuenta":
+            return JsonResponse(cuenta.deleteCuenta(self.request.data, user_id), safe=False)

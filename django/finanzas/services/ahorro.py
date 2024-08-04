@@ -2,9 +2,12 @@ from finanzas.models import Ahorro, TipoAhorro
 from core.helpers.alert import alerta
 from django.db.models import F
 import finanzas.const as finanza
+from datetime import date
+from datetime import datetime
 
 class AhorroApi():
     user_id = None
+    hoy = date.today()
     
     def __init__(self, user_id):
         self.validateUser(user_id)
@@ -27,6 +30,7 @@ class AhorroApi():
                         tipo_meta_nombre = F('tipo_ahorro__tipo_meta__nombre'),
                     )
                     .values(
+                        'id',
                         'nombre',
                         'cantidad',
                         'cantidad_objetivo',
@@ -47,12 +51,19 @@ class AhorroApi():
         if not tipo_ahorro:
             alerta(errors=['Tipo de ahorro no encontrado'])
 
-        cantidad_objetivo = data.get('cantidad_objetivo')
-        fecha_objetivo = data.get('fecha_objetivo')
-        cantidad = data.get('cantidad')
-        nombre = data.get('nombre')  # Corregido aquí
+        fecha_objetivo = data.get('fecha_objetivo', None)
+        nombre = data.get('nombre') 
+        cantidad = data.get('cantidad', None)
+        cantidad_objetivo = data.get('cantidad_objetivo', None)
         
         ahorro_id = data.get('id')
+        
+        if fecha_objetivo == '':
+            fecha_objetivo = None
+        if cantidad_objetivo == '':
+            cantidad_objetivo = None
+        if cantidad == '':
+            cantidad = None
 
         if cantidad is None:
             alerta(errors=["Ingrese una cantidad válida"])
@@ -63,12 +74,12 @@ class AhorroApi():
         if finanza.tm_fecha == tipo_ahorro.tipo_meta and fecha_objetivo is None:
             alerta(errors=["Ingrese una fecha objetivo válida"])
         
-        if tipo_ahorro.tipo_meta == finanza.tm_corriente:
+        if tipo_ahorro.tipo_meta.id == finanza.tm_corriente:
             cantidad_objetivo = None
             fecha_objetivo = None
-        elif tipo_ahorro.tipo_meta == finanza.tm_cantidad:
+        elif tipo_ahorro.tipo_meta.id == finanza.tm_cantidad:
             fecha_objetivo = None
-        elif tipo_ahorro.tipo_meta == finanza.tm_fecha:
+        elif tipo_ahorro.tipo_meta.id == finanza.tm_fecha:
             cantidad_objetivo = None
         
         if nombre is None:
@@ -91,6 +102,18 @@ class AhorroApi():
                 ahorro.cantidad = cantidad
                 ahorro.cantidad_objetivo = cantidad_objetivo
                 ahorro.fecha_objetivo = fecha_objetivo
+                ahorro.meta_alcanzada = False
+                
+                if ahorro.cantidad_objetivo is not None and ahorro.cantidad_objetivo <= cantidad:
+                    ahorro.meta_alcanzada = True
+                if ahorro.fecha_objetivo is not None:
+                    if isinstance(ahorro.fecha_objetivo, str):
+                        ahorro.fecha_objetivo = datetime.strptime(ahorro.fecha_objetivo, '%Y-%m-%d').date()
+                    if isinstance(self.hoy, str):
+                        self.hoy = datetime.strptime(self.hoy, '%Y-%m-%d').date()
+                        
+                    if ahorro.fecha_objetivo <= self.hoy:
+                        ahorro.meta_alcanzada = True
             except Ahorro.DoesNotExist:
                 alerta(errors=['No se encontró la cuenta'])
         
@@ -99,3 +122,26 @@ class AhorroApi():
             return {'success': True, 'message': 'Se guardó correctamente'}
         except Exception as e:
             return {'success': False, 'message': f'Algo salió mal: {str(e)}'}
+    
+    def deleteCuenta(self, data, usuario_id):
+        cuenta_id = data.get('id', None)
+
+        if cuenta_id is None:
+            alerta(errors=['No se proporcionó el ID de la cuenta'])
+
+        try:
+            # Obtén la cuenta utilizando el ID proporcionado
+            cuenta = Ahorro.objects.get(id=cuenta_id)
+
+            # Verifica si la cuenta pertenece al usuario especificado
+            if cuenta.usuario.id != usuario_id:
+                alerta(errors=['La cuenta no pertenece al usuario especificado'])
+            if cuenta.cantidad != 0:
+                alerta(errors=['La cuenta debe estar a $0 para poder eliminarla'])
+
+            # Elimina la cuenta
+            cuenta.delete()
+            return {'success': True, 'message': 'Se eimino correctamente'}
+
+        except Ahorro.DoesNotExist:
+            alerta(errors=['No se encontró la cuenta'])
