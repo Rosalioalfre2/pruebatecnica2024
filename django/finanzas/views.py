@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, 
 from core.helpers.jwt import getPayloadJWT
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 class OrigenMovimientoView(viewsets.ModelViewSet):
     from .models import OrigenMovimiento
@@ -174,3 +175,16 @@ class TipoMovimientoView(viewsets.ModelViewSet):
                 instance.delete()
             else:
                 raise alerta(errors=["No tienes permiso para eliminar este objeto."])
+
+class CuentasApiView(APIView):
+    def post(self, request):
+        from finanzas.services.ahorro import AhorroApi
+        option = self.request.GET.get('op')
+        user_id = getPayloadJWT(self.request, "user_id")
+        
+        cuenta = AhorroApi(user_id=user_id)
+
+        if option == "listCuentas":
+            return JsonResponse(cuenta.getCuentas(), safe=False)
+        elif option == "addCuenta":
+            return JsonResponse(cuenta.addCuenta(self.request.data, user_id), safe=False)

@@ -12,4 +12,5 @@ router.register( r'OrigenMovimiento', views.OrigenMovimientoView, 'OrigenMovimie
 # EL RESTO DE RUTAS
 urlpatterns = [
     path('', include(router.urls)),
+    path('api/cuenta', views.CuentasApiView.as_view(), name='api.cuentas'),
 ]

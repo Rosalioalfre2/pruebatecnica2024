@@ -1,11 +1,12 @@
 import NavbarSidebarLayout from "../layouts/navbar-sidebar";
 import { useAuth } from "@/context/AuthContext";
+import { Cuentas } from "./cuenta/Cuentas";
 
 const DashboardPage = function () {
   const { userData } = useAuth();
   return (
     <NavbarSidebarLayout title={`Bienvenido ${userData.user ?? ""}`}>
-      <h1>Prueba tecnica</h1>
+      <Cuentas />
     </NavbarSidebarLayout>
   );
 };
