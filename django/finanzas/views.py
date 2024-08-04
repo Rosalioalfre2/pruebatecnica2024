@@ -116,16 +116,18 @@ class TipoMovimientoView(viewsets.ModelViewSet):
         isAdmin = getPayloadJWT(self.request, "is_admin")
         userId = getPayloadJWT(self.request, "user_id")
         option = self.request.GET.get('op')
+        origen = self.request.GET.get('origen')
         queryset = super().get_queryset()
         
         if isAdmin and option=='admin':
-            queryset = queryset.filter(Q(usuario__isnull=True) & Q(deleted_at__isnull=True))
+            queryset = queryset.filter(Q(usuario__isnull=True) & Q(deleted_at__isnull=True) & Q(origen=origen))
         elif option == 'select':
             queryset = queryset.filter(
                 (Q(usuario__isnull=True) | Q(usuario=userId)) 
-                & Q(deleted_at__isnull=True))
+                & Q(deleted_at__isnull=True)
+                & Q(origen=origen))
         else:
-            queryset = queryset.filter(usuario=userId, deleted_at__isnull=True)
+            queryset = queryset.filter(usuario=userId, deleted_at__isnull=True, origen=origen)
         
         return queryset
     

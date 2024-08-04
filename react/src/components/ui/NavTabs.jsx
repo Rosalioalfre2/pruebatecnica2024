@@ -11,7 +11,7 @@ const NavTabs = ({
   return (
     <Tabs
       aria-label="Tabs with icons"
-      style="fullWidth"
+      variant="fullWidth"
       onActiveTabChange={(indice) => setIndex([...index, indice])}
     >
       {items

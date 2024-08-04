@@ -6,8 +6,9 @@ import {TipoMeta} from '@/pages/admin/TipoMeta'
 import { TipoAhorro } from "@/pages/admin/TipoAhorro";
 import { OrigenMovimiento } from "@/pages/admin/OrigenMovimiento";
 import { LuMove3D } from "react-icons/lu";
-import { TipoMovimiento } from "@/pages/admin/TipoMovimiento";
+// import { TipoMovimiento } from "@/pages/admin/TipoMovimiento";
 import { FaArrowsUpDown } from "react-icons/fa6";
+import { TabTipoMovimiento } from "@/pages/admin/TabTipoMovimiento";
 
 let routesItems = [];
 
@@ -28,7 +29,7 @@ const adminRutas = [
         to: "tipo_movimiento",
         label: "Tipos de movimientos",
         icon: FaArrowsUpDown,
-        children: <TipoMovimiento tipo="admin" />,
+        children: <TabTipoMovimiento tipo="admin" />,
       },
       {
         to: "tipo_ahorro",
@@ -62,7 +63,7 @@ const userConfig = [
         to: "tipo_movimiento",
         label: "Tipos de movimientos",
         icon: FaArrowsUpDown,
-        children: <TipoMovimiento />,
+        children: <TabTipoMovimiento />,
       },
     ],
   },
