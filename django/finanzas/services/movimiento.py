@@ -1,5 +1,5 @@
 from django.db import transaction, IntegrityError
-from django.db.models import F, Sum, Value, DateField, ExpressionWrapper
+from django.db.models import F, Sum, Value, DateField, ExpressionWrapper, Case, When, Value, DecimalField, CharField
 from django.db.models.functions import TruncWeek, TruncMonth
 from finanzas.models import Ahorro, TipoMovimiento, Movimiento
 from core.helpers.alert import alerta
@@ -245,53 +245,79 @@ class MovimientoApi:
     def listMovimientosPorSemana(self):
         movimientos = list(Movimiento.objects
                         .filter(
-                            cuenta__id=self.cuenta.id,
+                            cuenta__id=self.cuenta_id,
                             fecha__isnull=False,
                             deleted_at__isnull=True
-                            )
+                        )
                         .annotate(
-                            origen_id=F('tipo_movimiento__origen__id'),
-                            origen_nombre=F('tipo_movimiento__origen__nombre'),
                             semana_inicio=TruncWeek('fecha', output_field=DateField()),
                             semana_fin=ExpressionWrapper(TruncWeek('fecha', output_field=DateField()) + timedelta(days=6), output_field=DateField())
                         )
                         .values(
                             'semana_inicio',
-                            'semana_fin',
-                            'origen_id',
-                            'origen_nombre',
+                            'semana_fin'
                         )
                         .annotate(
-                            total_cantidad=Sum('cantidad')
+                            gastos_total=Sum(Case(
+                                When(tipo_movimiento__origen__id=finanza.om_gasto, then=F('cantidad')), 
+                                default=Value(0), 
+                                output_field=DecimalField(max_digits=10, decimal_places=2)
+                            )),
+                            ingresos_total=Sum(Case(
+                                When(tipo_movimiento__origen__id=finanza.om_ingreso, then=F('cantidad')), 
+                                default=Value(0), 
+                                output_field=DecimalField(max_digits=10, decimal_places=2)
+                            ))
                         )
                         .order_by('-semana_inicio'))
+
+        cantidad_acumulada = 0
+        for movimiento in movimientos:
+            movimiento['gastos_total'] = round(movimiento['gastos_total'], 2)
+            movimiento['ingresos_total'] = round(movimiento['ingresos_total'], 2)
+            cantidad_acumulada += movimiento['ingresos_total'] - movimiento['gastos_total']
+            movimiento['cantidad_acumulada'] = round(cantidad_acumulada, 2)
+            movimiento['bandera'] = finanza.om_gasto if movimiento['gastos_total'] > movimiento['ingresos_total'] else finanza.om_ingreso
+
         return movimientos
     
     def listMovimientosPorMes(self):
         movimientos = list(Movimiento.objects
                         .filter(
-                            cuenta__id=self.cuenta.id,
+                            cuenta__id=self.cuenta_id,
                             fecha__isnull=False,
                             deleted_at__isnull=True
-                            )
+                        )
                         .annotate(
-                            origen_id=F('tipo_movimiento__origen__id'),
-                            origen_nombre=F('tipo_movimiento__origen__nombre'),
                             inicio_mes=TruncMonth('fecha', output_field=DateField())
                         )
                         .values(
-                            'inicio_mes',
-                            'origen_id',
-                            'origen_nombre'
+                            'inicio_mes'
                         )
                         .annotate(
-                            total_cantidad=Sum('cantidad')
+                            gastos_total=Sum(Case(
+                                When(tipo_movimiento__origen__id=finanza.om_gasto, then=F('cantidad')), 
+                                default=Value(0), 
+                                output_field=DecimalField(max_digits=10, decimal_places=2)
+                            )),
+                            ingresos_total=Sum(Case(
+                                When(tipo_movimiento__origen__id=finanza.om_ingreso, then=F('cantidad')), 
+                                default=Value(0), 
+                                output_field=DecimalField(max_digits=10, decimal_places=2)
+                            ))
                         )
-                        .order_by('-inicio_mes'))
+                        .order_by('inicio_mes'))
 
+        cantidad_acumulada = 0
         for movimiento in movimientos:
             inicio_mes = movimiento['inicio_mes']
             fin_mes = date(inicio_mes.year, inicio_mes.month, monthrange(inicio_mes.year, inicio_mes.month)[1])
             movimiento['fin_mes'] = fin_mes
+            
+            movimiento['gastos_total'] = round(movimiento['gastos_total'], 2)
+            movimiento['ingresos_total'] = round(movimiento['ingresos_total'], 2)
+            cantidad_acumulada += movimiento['ingresos_total'] - movimiento['gastos_total']
+            movimiento['cantidad_acumulada'] = round(cantidad_acumulada, 2)
+            movimiento['bandera'] = finanza.om_gasto if movimiento['gastos_total'] > movimiento['ingresos_total'] else finanza.om_ingreso
 
         return movimientos

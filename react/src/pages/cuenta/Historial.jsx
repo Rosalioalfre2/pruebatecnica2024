@@ -241,11 +241,12 @@ const CardMovimientoSemana = ({movimientos}) =>{
   return (
     <div className="w-full flex flex-col">
       {movimientos.map((movimiento, index)=>(
-        <div className={`mt-4 space-y-2 p-4 grid grid-cols-1 md:grid-cols-4 gap-2 rounded border-3 ${movimiento.origen_id == om_ingreso 
+        <div className={`mt-4 space-y-2 p-4 grid grid-cols-1 md:grid-cols-4 gap-2 rounded border-3 ${movimiento.bandera == om_ingreso 
           ? "bg-green-400 dark:bg-green-800 border-green-800 dark:border-green-600"
           : "bg-red-400 dark:bg-red-800 border-red-800 dark:border-red-600" }`} key={index}>
-          <p className="text-2xl font-semibold text-center"><span className="font-bold">{movimiento.origen_nombre}</span></p>
-          <p className="text-2xl font-semibold">Cantidad: <span className="font-bold">${movimiento.total_cantidad}</span></p>
+          <p className="text-2xl font-semibold text-center"><span className="font-bold">Ingresos: {movimiento.ingresos_total}</span></p>
+          <p className="text-2xl font-semibold text-center"><span className="font-bold">Gastos: {movimiento.gastos_total}</span></p>
+          <p className="text-2xl font-semibold">Acumulado: <span className="font-bold">${movimiento.cantidad_acumulada}</span></p>
           <p className="text-xl font-semibold">Semana: <span className="font-bold">{movimiento.semana_inicio} - {movimiento.semana_fin}</span></p>
         </div>
       ))}
@@ -257,11 +258,12 @@ const CardMovimientoMes = ({movimientos}) =>{
   return (
     <div className="w-full flex flex-col">
       {movimientos.map((movimiento, index)=>(
-        <div className={`mt-4 space-y-2 p-4 grid grid-cols-1 md:grid-cols-4 gap-2 rounded border-3 ${movimiento.origen_id == om_ingreso 
+        <div className={`mt-4 space-y-2 p-4 grid grid-cols-1 md:grid-cols-4 gap-2 rounded border-3 ${movimiento.bandera == om_ingreso 
           ? "bg-green-400 dark:bg-green-800 border-green-800 dark:border-green-600"
           : "bg-red-400 dark:bg-red-800 border-red-800 dark:border-red-600" }`} key={index}>
-          <p className="text-2xl font-semibold text-center"><span className="font-bold">{movimiento.origen_nombre}</span></p>
-          <p className="text-2xl font-semibold">Cantidad: <span className="font-bold">${movimiento.total_cantidad}</span></p>
+          <p className="text-2xl font-semibold text-center"><span className="font-bold">Ingresos: {movimiento.ingresos_total}</span></p>
+          <p className="text-2xl font-semibold text-center"><span className="font-bold">Gastos: {movimiento.gastos_total}</span></p>
+          <p className="text-2xl font-semibold">Acumulado: <span className="font-bold">${movimiento.cantidad_acumulada}</span></p>
           <p className="text-xl font-semibold">Mes: <span className="font-bold">{movimiento.inicio_mes} - {movimiento.fin_mes}</span></p>
         </div>
       ))}

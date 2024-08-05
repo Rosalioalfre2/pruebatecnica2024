@@ -28,23 +28,21 @@
     <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
         <thead>
             <tr>
-                <th>Tipo Movimiento Nombre</th>
-                <th>Origen ID</th>
-                <th>Origen Nombre</th>
+                <th>Tipo Movimiento</th>
+                <th>Origen</th>
                 <th>Fecha</th>
                 <th>Cantidad</th>
-                <th>Tipo Movimiento ID</th>
             </tr>
         </thead>
         <tbody>
             {% for movimiento in movimientos %}
             <tr>
                 <td>{{ movimiento.tipo_movimiento_nombre }}</td>
-                <td>{{ movimiento.origen_id }}</td>
+                {% comment %} <td>{{ movimiento.origen_id }}</td> {% endcomment %}
                 <td>{{ movimiento.origen_nombre }}</td>
                 <td>{{ movimiento.fecha }}</td>
-                <td>{{ movimiento.cantidad }}</td>
-                <td>{{ movimiento.tipo_movimiento_id }}</td>
+                <td>${{ movimiento.cantidad }}</td>
+                {% comment %} <td>{{ movimiento.tipo_movimiento_id }}</td> {% endcomment %}
             </tr>
             {% endfor %}
         </tbody>
