@@ -90,6 +90,7 @@ class AhorroApi():
                 tipo_ahorro=tipo_ahorro,
                 nombre=nombre,
                 cantidad=cantidad,
+                cantidad_inicial=cantidad,
                 cantidad_objetivo=cantidad_objetivo,
                 fecha_objetivo=fecha_objetivo,
                 usuario_id=usuario_id
@@ -144,4 +145,39 @@ class AhorroApi():
             return {'success': True, 'message': 'Se eimino correctamente'}
 
         except Ahorro.DoesNotExist:
-            alerta(errors=['No se encontró la cuenta'])
+            alerta(errors=['No se encontró la cuenta'])\
+    
+    def getCuenta(self, data):
+        cuenta_id = data.get('cuenta_id',None)
+        if cuenta_id is None:
+            alerta(errors=['Ingrese un cuenta valida'])
+        
+        cuenta = list(Ahorro
+                      .objects
+                      .filter(
+                          id=cuenta_id,
+                          deleted_at__isnull=True
+                        )
+                      .annotate(
+                          tipo_ahorro_nombre = F('tipo_ahorro__nombre'),
+                          tipo_meta_id = F('tipo_ahorro__tipo_meta__id'),
+                          tipo_meta_nombre = F('tipo_ahorro__tipo_meta__nombre'),
+                      )
+                      .values(
+                          'nombre',
+                          'cantidad',
+                          'cantidad_objetivo',
+                          'fecha_objetivo',
+                          'meta_alcanzada',
+                          'cantidad_inicial',
+                          'tipo_ahorro_id',
+                          'tipo_meta_id',
+                          'tipo_meta_nombre',
+                      ))
+
+        if len(cuenta) == 0:
+            alerta(errors=['No se encontro la cuenta'])
+        
+        cuenta = cuenta[0]
+        
+        return cuenta

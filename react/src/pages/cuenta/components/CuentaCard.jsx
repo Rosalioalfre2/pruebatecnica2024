@@ -7,10 +7,12 @@ import { useEffect, useState } from 'react';
 import {Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure} from "@nextui-org/react";
 import { Label, Select, TextInput } from 'flowbite-react';
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 
 const CuentaCard = ({ cuenta, actualiza, setActualiza, tipoAhorro }) => {
-  
+  const navigate = useNavigate();
+
   const deleteCuenta = async (id) =>{
     try{
       const response = await axiosApi.post('/finanza/api/cuenta?op=deleteCuenta',{id})
@@ -71,6 +73,10 @@ const CuentaCard = ({ cuenta, actualiza, setActualiza, tipoAhorro }) => {
           Eliminar
         </Button>
         <FormCuenta cuenta={cuenta} editar={true} actualiza={actualiza} setActualiza={setActualiza} tipoAhorro={tipoAhorro} />
+        <Button color='warning' onClick={()=>
+        navigate(
+          `/history/cuenta/${cuenta.id}/`,
+        )}>Historial</Button>
         <MovimientoModal cuenta_id={cuenta.id} actualiza={actualiza} setActualiza={setActualiza} origen={om_gasto} color="secondary" />
         <MovimientoModal cuenta_id={cuenta.id} actualiza={actualiza} setActualiza={setActualiza} origen={om_ingreso} color="primary" />
       </div>

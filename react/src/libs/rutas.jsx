@@ -9,6 +9,7 @@ import { LuMove3D } from "react-icons/lu";
 // import { TipoMovimiento } from "@/pages/admin/TipoMovimiento";
 import { FaArrowsUpDown } from "react-icons/fa6";
 import { TabTipoMovimiento } from "@/pages/admin/TabTipoMovimiento";
+import { CuentaHistorial } from "../pages/cuenta/Historial";
 
 let routesItems = [];
 
@@ -69,9 +70,26 @@ const userConfig = [
   },
 ];
 
+const historial = [
+  {
+    label: "Historial",
+    identifier: "history",
+    // roles: ["admin",],
+    items: [
+      {
+        to: "cuenta/:cuenta_id",
+        label: "Historial de cuenta",
+        navbar:false,
+        children:<CuentaHistorial />,
+      },
+    ],
+  },
+]
+
 routesItems = [
   ...adminRutas,
-  ...userConfig
+  ...historial,
+  ...userConfig,
 ];
 
 export { routesItems };

@@ -1,4 +1,5 @@
 from django.db import transaction, IntegrityError
+from django.db.models import F
 from finanzas.models import Ahorro, TipoMovimiento, Movimiento
 from core.helpers.alert import alerta
 import finanzas.const as finanza
@@ -99,4 +100,26 @@ class MovimientoApi:
                 return {'success': True, 'message': 'Se registro correctamente'}
         except IntegrityError as e:
             return {'success': False, 'message': f'Algo salio mal: {str(e)}'}
+    
+    def listMovimientos(self):
+        movimientos = list(Movimiento.objects
+                           .filter(
+                               cuenta__id=self.cuenta.id,
+                               fecha__isnull=False,
+                               deleted_at__isnull=True
+                            )
+                           .annotate(
+                               tipo_movimiento_nombre = F('tipo_movimiento__nombre'),
+                               origen_id = F('tipo_movimiento__origen__id'),
+                               origen_nombre = F('tipo_movimiento__origen__nombre'),
+                           ).values(
+                            'tipo_movimiento_nombre',
+                            'origen_id',
+                            'origen_nombre',
+                            'fecha',
+                            'cantidad',
+                            'tipo_movimiento_id'
+                           )
+                           .order_by('-fecha'))
         
+        return movimientos

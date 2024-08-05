@@ -190,6 +190,8 @@ class CuentasApiView(APIView):
             return JsonResponse(cuenta.addCuenta(self.request.data, user_id), safe=False)
         elif option == "deleteCuenta":
             return JsonResponse(cuenta.deleteCuenta(self.request.data, user_id), safe=False)
+        elif option == "getCuenta":
+            return JsonResponse(cuenta.getCuenta(self.request.data), safe=False)
         else:
             alerta(errors=['Opcion no valida'])
 
@@ -204,5 +206,7 @@ class MovimientoApiView(APIView):
 
         if option == "registerMovimiento":
             return JsonResponse(cuenta.registerMovimiento(data=self.request.data), safe=False)
+        elif option == "listMovimientos":
+            return JsonResponse(cuenta.listMovimientos(), safe=False)
         else:
             alerta(errors=['Opcion no valida'])

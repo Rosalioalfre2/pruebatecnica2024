@@ -31,6 +31,7 @@ class TipoAhorro(models.Model):
 class Ahorro(models.Model):
     nombre = models.CharField(max_length= 50, verbose_name="Nombre")
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Cantidad")
+    cantidad_inicial = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Cantidad inicial", default=0)
     cantidad_objetivo = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Cantidad", null=True, blank=True)
     fecha_objetivo = models.DateField(verbose_name="Fecha objetivo",null=True, blank=True)
     meta_alcanzada = models.BooleanField(verbose_name='Meta alcanzada', default=False)
