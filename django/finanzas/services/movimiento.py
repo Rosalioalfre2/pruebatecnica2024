@@ -204,7 +204,11 @@ class MovimientoApi:
         if len(movimientos) == 0:
             alerta(errors=['No se encontraron movimientos aun'])
             
-        html_string = render_to_string('movimientos.html', {'movimientos': movimientos})
+        html_string = render_to_string('movimientos.html', {
+            'cuenta': self.cuenta,
+            'movimientos': movimientos,
+            'tm_corriente': finanza.tm_corriente 
+        })
         
         pdf_file = HTML(string=html_string).write_pdf()
 
