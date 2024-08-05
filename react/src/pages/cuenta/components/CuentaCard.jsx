@@ -38,29 +38,30 @@ const CuentaCard = ({ cuenta, actualiza, setActualiza, tipoAhorro }) => {
   return (
     <div className="w-full rounded overflow-hidden shadow-lg bg-white dark:bg-gray-800">
       <div className="px-6 py-4">
-        <div className="font-bold text-xl mb-2 text-gray-900 dark:text-white">{cuenta.nombre}</div>
-        <p className="text-gray-700 dark:text-gray-300 text-base">
-          Cantidad: {cuenta.cantidad} <br />
-          Tipo de ahorro: {cuenta.tipo_ahorro_nombre} <br />
+        <div className='text-3xl font-semibold'>Cantidad: ${cuenta.cantidad}</div>
+        <div className="font-bold text-2xl mb-2 text-gray-900 dark:text-white">{cuenta.nombre}</div>
+        <p className="text-gray-700 dark:text-gray-300 text-xl">
+          Tipo de ahorro: <span className='font-bold'>{cuenta.tipo_ahorro_nombre}</span> <br />
           {cuenta.tipo_meta !== tm_corriente && (
             <>
-              Tipo de meta: {cuenta.tipo_meta_nombre} <br />
+              Tipo de meta: <span className='font-bold'>{cuenta.tipo_meta_nombre}</span> <br />
             </>
           )}
-          {cuenta.tipo_meta != tm_corriente &&
-            (cuenta.meta_alcanzada ? 'Meta alcanzada' : 'Meta no alcanzada')}
         </p>
+        <div className='font-bold mt-4'>{cuenta.tipo_meta != tm_corriente &&
+            (<span className={`p-4 rounded-xl ${cuenta.meta_alcanzada ? "bg-green-500 dark:bg-green-600" : "bg-red-400 dark:bg-red-600" }`}>{cuenta.meta_alcanzada ? 'Meta alcanzada' : 'Meta no alcanzada'}</span>)}
+        </div>
       </div>
       {cuenta.cantidad_objetivo && (
-        <div className="px-6 pt-4 pb-2">
-          <span className="inline-block bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2 mb-2">
-            Objetivo: {cuenta.cantidad_objetivo}
+        <div className="px-6 pt-2 pb-2">
+          <span className="inline-block bg-green-400 dark:bg-green-700 rounded-full px-3 py-1 text-lg font-semibold text-gray-700 dark:text-gray-100 mr-2 mb-2">
+            Objetivo: ${cuenta.cantidad_objetivo}
           </span>
         </div>
       )}
       {cuenta.fecha_objetivo && (
-        <div className="px-6 pt-4 pb-2">
-          <span className="inline-block bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2 mb-2">
+        <div className="px-6 pt-2 pb-2">
+          <span className="inline-block bg-blue-400 dark:bg-blue-700 rounded-full px-3 py-1 text-lg font-semibold text-gray-700 dark:text-gray-100 mr-2 mb-2">
             Fecha objetivo: {cuenta.fecha_objetivo}
           </span>
         </div>
