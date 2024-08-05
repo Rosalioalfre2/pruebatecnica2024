@@ -8,6 +8,10 @@ import decimal
 from datetime import date
 from datetime import datetime, timedelta
 from calendar import monthrange
+import csv
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 class MovimientoApi:
     
@@ -125,6 +129,89 @@ class MovimientoApi:
                            .order_by('-fecha'))
         
         return movimientos
+    
+    def listMovimientosCSV(self):
+        movimientos = list(Movimiento.objects
+                        .filter(
+                            cuenta__id=self.cuenta_id,
+                            fecha__isnull=False,
+                            deleted_at__isnull=True
+                        )
+                        .annotate(
+                            tipo_movimiento_nombre=F('tipo_movimiento__nombre'),
+                            origen_id=F('tipo_movimiento__origen__id'),
+                            origen_nombre=F('tipo_movimiento__origen__nombre'),
+                        ).values(
+                            'tipo_movimiento_nombre',
+                            'origen_id',
+                            'origen_nombre',
+                            'fecha',
+                            'cantidad',
+                            'tipo_movimiento_id'
+                        )
+                        .order_by('fecha'))
+        
+        if len(movimientos) == 0:
+            alerta(errors=['No se encontraron movimientos aun'])
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="movimientos.csv"'
+        
+        writer = csv.writer(response)
+        
+        writer.writerow([
+            'Tipo Movimiento Nombre',
+            'Origen ID',
+            'Origen Nombre',
+            'Fecha',
+            'Cantidad',
+            'Tipo Movimiento ID'
+        ])
+        
+        for movimiento in movimientos:
+            writer.writerow([
+                movimiento['tipo_movimiento_nombre'],
+                movimiento['origen_id'],
+                movimiento['origen_nombre'],
+                movimiento['fecha'],
+                movimiento['cantidad'],
+                movimiento['tipo_movimiento_id']
+            ])
+        
+        return response
+    
+    def listMovimientosPDF(self):
+        movimientos = list(Movimiento.objects
+                        .filter(
+                            cuenta__id=self.cuenta_id,
+                            fecha__isnull=False,
+                            deleted_at__isnull=True
+                        )
+                        .annotate(
+                            tipo_movimiento_nombre=F('tipo_movimiento__nombre'),
+                            origen_id=F('tipo_movimiento__origen__id'),
+                            origen_nombre=F('tipo_movimiento__origen__nombre'),
+                        ).values(
+                            'tipo_movimiento_nombre',
+                            'origen_id',
+                            'origen_nombre',
+                            'fecha',
+                            'cantidad',
+                            'tipo_movimiento_id'
+                        )
+                        .order_by('fecha'))
+        
+        if len(movimientos) == 0:
+            alerta(errors=['No se encontraron movimientos aun'])
+            
+        html_string = render_to_string('movimientos.html', {'movimientos': movimientos})
+        
+        pdf_file = HTML(string=html_string).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="movimientos.pdf"'
+
+        return response
     
     def chartMovimientos(self):
         movimientos = list(Movimiento.objects

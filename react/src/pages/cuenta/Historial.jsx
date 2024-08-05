@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { notify } from "@/components/toast";
 import { tm_corriente, om_ingreso} from '@/const/finanzas'
 import {Container, Row, Col, NavTabs} from '../../components/ui/Index'
-import { FaCalendar, FaCalendarWeek, FaClock } from "react-icons/fa6";
+import { FaCalendar, FaCalendarWeek, FaClock, FaFileCsv, FaFilePdf } from "react-icons/fa6";
+import { Button } from "@nextui-org/react";
 
 const CuentaHistorial = () =>{
   const { cuenta_id } = useParams();
@@ -14,6 +15,7 @@ const CuentaHistorial = () =>{
   const [movimientosSemana, setMovimientosSemana] = useState([])
   const [movimientosMes, setMovimientosMes] = useState([])
   const [cuenta, setCuenta] = useState({})
+  const [loading, setLoading] = useState(false)
   
   const getCuentaHistorial = async () =>{
     try {
@@ -91,6 +93,62 @@ const CuentaHistorial = () =>{
     }   
   }
 
+  const getMovimientoCSV = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosApi.post(
+        "/finanza/api/movimiento?op=listMovimientosCSV",
+        {
+          cuenta_id
+        },
+        // {
+        //   responseType: "blob",
+        // },
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "movimientos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      // }
+    } catch (error) {
+      notify("Error en la petición", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMovimientoPDF = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosApi.post(
+        "/finanza/api/movimiento?op=listMovimientosPDF",
+        {
+          cuenta_id
+        },
+        {
+          responseType: "blob",
+        },
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "movimientos.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      // }
+    } catch (error) {
+      notify("Error en la petición", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(()=>{
     getCuentaHistorial();
     getCuenta();
@@ -135,6 +193,16 @@ const CuentaHistorial = () =>{
           </Col>
           {cuenta.cantidad_objetivo && <Col size={50}><p className="text-xl">Cantidad objetivo: <span className="font-bold">{cuenta.cantidad_objetivo}</span></p></Col>}
           {cuenta.fecha_objetivo && <Col size={50}><p className="text-xl">Fecha objetivo: <span className="font-bold">{cuenta.fecha_objetivo}</span></p></Col>}
+        </Row>
+        <Row>
+          <Col className="flex flex-col md:flex-row mt-2 gap-4">
+            <Button color="success" startContent={<FaFileCsv />} onClick={getMovimientoCSV} isLoading={loading}>
+              Generar CSV
+            </Button>
+            <Button color="primary" startContent={<FaFilePdf />} onClick={getMovimientoPDF} isLoading={loading}>
+              Generar PDF
+            </Button>
+          </Col>
         </Row>
       </Container>
       <Container className="mt-4">

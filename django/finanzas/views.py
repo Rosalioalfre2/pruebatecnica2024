@@ -214,5 +214,9 @@ class MovimientoApiView(APIView):
             return JsonResponse(cuenta.listMovimientosPorSemana(), safe=False)
         elif option == "listMovimientosPorMes":
             return JsonResponse(cuenta.listMovimientosPorMes(), safe=False)
+        elif option == "listMovimientosCSV":
+            return cuenta.listMovimientosCSV()
+        elif option == "listMovimientosPDF":
+            return cuenta.listMovimientosPDF()
         else:
             alerta(errors=['Opcion no valida'])
