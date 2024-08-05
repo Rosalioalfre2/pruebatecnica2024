@@ -14,16 +14,14 @@ const FormCuenta = ({ editar=false, cuenta=null, actualiza, setActualiza, tipoAh
   const [tipoMeta, setTipoMeta] = useState(null);
 
   const handleClose = () => {
-    reset(); // Resetea el formulario
-    onOpenChange(false); // Cierra el modal
+    reset();
+    onOpenChange(false);
   };
 
   const addCuenta = async (data) => {
-    let result = [];
     try {
       const response = await axiosApi.post('/finanza/api/cuenta?op=addCuenta', data);
       if (response.status === 200) {
-        result = response.data;
         
         if(response.data.success && response.data.message){
           notify(response.data.message, response.data.success ? 'success' : 'warning')
@@ -31,15 +29,15 @@ const FormCuenta = ({ editar=false, cuenta=null, actualiza, setActualiza, tipoAh
       }
       setActualiza(actualiza + 1)
     } catch (error) {
-      result = [];
       if(error.response.status == 400 && error.response.data.errors){
         notify(JSON.stringify(error.response.data.errors), 'error')
       }
       else{
         notify('Ooops, algo salio mal, vuelva intentar.', 'error')
       }
+      return false;
     }
-    return result;
+    return true;
   };
 
   useEffect(() => {
@@ -69,8 +67,10 @@ const FormCuenta = ({ editar=false, cuenta=null, actualiza, setActualiza, tipoAh
   }, [editar, cuenta, tipoAhorro]);
 
   const onSubmit = async (data) => {
-    await addCuenta(data);
-    handleClose();
+    const cerrar = await addCuenta(data);
+    if(cerrar){
+      handleClose();
+    }
   };
 
   return (

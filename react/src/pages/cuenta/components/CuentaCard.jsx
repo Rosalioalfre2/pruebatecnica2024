@@ -120,8 +120,10 @@ const MovimientoModal = ({cuenta_id, origen, color, setActualiza, actualiza}) =>
   };
 
   const onSubmit = async (data) => {
-    await addMovimiento(data, cuenta_id, setActualiza, actualiza);
-    handleClose();
+    const cerrar = await addMovimiento(data, cuenta_id, setActualiza, actualiza);
+    if(cerrar){
+      handleClose();
+    }
   };
 
   return (
@@ -202,11 +204,9 @@ const MovimientoModal = ({cuenta_id, origen, color, setActualiza, actualiza}) =>
 }
 
 const addMovimiento = async (data, cuenta_id, setActualiza, actualiza) =>{
-  let result = [];
   try {
     const response = await axiosApi.post(`/finanza/api/movimiento?op=registerMovimiento`, {...data, cuenta_id});
     if (response.status === 200) {
-      result = response.data;
       
       if(response.data.success && response.data.message){
         notify(response.data.message, response.data.success ? 'success' : 'warning')
@@ -214,13 +214,13 @@ const addMovimiento = async (data, cuenta_id, setActualiza, actualiza) =>{
     }
     setActualiza(actualiza + 1)
   } catch (error) {
-    result = [];
     if(error.response.status == 400 && error.response.data.errors){
       notify(JSON.stringify(error.response.data.errors), 'error')
     }
     else{
       notify('Ooops, algo salio mal, vuelva intentar.', 'error')
     }
+    return false;
   }
-  return result;
+  return true;
 }
