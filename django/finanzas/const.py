@@ -9,3 +9,6 @@ om_gasto = 2
 tm_corriente = 1
 tm_cantidad = 2
 tm_fecha = 3
+
+# tmo = tipo de movimiento
+tmo_apertura = 1

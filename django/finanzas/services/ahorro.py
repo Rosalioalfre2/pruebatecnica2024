@@ -1,4 +1,4 @@
-from finanzas.models import Ahorro, TipoAhorro
+from finanzas.models import Ahorro, TipoAhorro, Movimiento
 from core.helpers.alert import alerta
 from django.db.models import F
 import finanzas.const as finanza
@@ -49,7 +49,7 @@ class AhorroApi():
         tipo_ahorro = TipoAhorro.objects.filter(id=tipo_ahorro_id).first()
 
         if not tipo_ahorro:
-            alerta(errors=['Tipo de ahorro no encontrado'])
+            return {'success': False, 'message': 'Tipo de ahorro no encontrado'}
 
         fecha_objetivo = data.get('fecha_objetivo', None)
         nombre = data.get('nombre') 
@@ -66,13 +66,13 @@ class AhorroApi():
             cantidad = None
 
         if cantidad is None:
-            alerta(errors=["Ingrese una cantidad válida"])
+            return {'success': False, 'message': 'Ingrese una cantidad válida'}
 
         if finanza.tm_cantidad == tipo_ahorro.tipo_meta and cantidad_objetivo is None:
-            alerta(errors=["Ingrese una cantidad objetivo válida"])
+            return {'success': False, 'message': 'Ingrese una cantidad objetivo válida'}
 
         if finanza.tm_fecha == tipo_ahorro.tipo_meta and fecha_objetivo is None:
-            alerta(errors=["Ingrese una fecha objetivo válida"])
+            return {'success': False, 'message': 'Ingrese una fecha objetivo válida'}
         
         if tipo_ahorro.tipo_meta.id == finanza.tm_corriente:
             cantidad_objetivo = None
@@ -83,20 +83,30 @@ class AhorroApi():
             cantidad_objetivo = None
         
         if nombre is None:
-            alerta(errors=['Ingrese un nombre válido'])
+            return {'success': False, 'message': 'Ingrese un nombre válido'}
 
-        if ahorro_id is None:
-            ahorro = Ahorro(
-                tipo_ahorro=tipo_ahorro,
-                nombre=nombre,
-                cantidad=cantidad,
-                cantidad_inicial=cantidad,
-                cantidad_objetivo=cantidad_objetivo,
-                fecha_objetivo=fecha_objetivo,
-                usuario_id=usuario_id
-            )
-        else:
-            try:
+        try:
+            if ahorro_id is None:
+                ahorro = Ahorro(
+                    tipo_ahorro=tipo_ahorro,
+                    nombre=nombre,
+                    cantidad=cantidad,
+                    cantidad_inicial=cantidad,
+                    cantidad_objetivo=cantidad_objetivo,
+                    fecha_objetivo=fecha_objetivo,
+                    usuario_id=usuario_id
+                )
+                ahorro.save()
+
+                movimiento = Movimiento(
+                    cantidad=cantidad,
+                    cuenta=ahorro,
+                    fecha=self.hoy,
+                    tipo_movimiento_id=finanza.tmo_apertura
+                )
+                movimiento.save()
+
+            else:
                 ahorro = Ahorro.objects.get(id=ahorro_id)
                 ahorro.tipo_ahorro = tipo_ahorro
                 ahorro.nombre = nombre
@@ -104,7 +114,7 @@ class AhorroApi():
                 ahorro.cantidad_objetivo = cantidad_objetivo
                 ahorro.fecha_objetivo = fecha_objetivo
                 ahorro.meta_alcanzada = False
-                
+
                 if ahorro.cantidad_objetivo is not None and ahorro.cantidad_objetivo <= cantidad:
                     ahorro.meta_alcanzada = True
                 if ahorro.fecha_objetivo is not None:
@@ -112,15 +122,15 @@ class AhorroApi():
                         ahorro.fecha_objetivo = datetime.strptime(ahorro.fecha_objetivo, '%Y-%m-%d').date()
                     if isinstance(self.hoy, str):
                         self.hoy = datetime.strptime(self.hoy, '%Y-%m-%d').date()
-                        
+
                     if ahorro.fecha_objetivo <= self.hoy:
                         ahorro.meta_alcanzada = True
-            except Ahorro.DoesNotExist:
-                alerta(errors=['No se encontró la cuenta'])
-        
-        try:
-            ahorro.save()
+                
+                ahorro.save()
+
             return {'success': True, 'message': 'Se guardó correctamente'}
+        except Ahorro.DoesNotExist:
+            return {'success': False, 'message': 'No se encontró la cuenta'}
         except Exception as e:
             return {'success': False, 'message': f'Algo salió mal: {str(e)}'}
     

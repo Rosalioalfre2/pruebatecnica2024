@@ -10,6 +10,7 @@ import { LuMove3D } from "react-icons/lu";
 import { FaArrowsUpDown } from "react-icons/fa6";
 import { TabTipoMovimiento } from "@/pages/admin/TabTipoMovimiento";
 import { CuentaHistorial } from "../pages/cuenta/Historial";
+import { GraficasContainer } from "../pages/cuenta/Graficas";
 
 let routesItems = [];
 
@@ -81,6 +82,12 @@ const historial = [
         label: "Historial de cuenta",
         navbar:false,
         children:<CuentaHistorial />,
+      },
+      {
+        to: "graficas/:cuenta_id",
+        label: "Graficas de cuenta",
+        navbar:false,
+        children:<GraficasContainer />,
       },
     ],
   },

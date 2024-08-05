@@ -77,6 +77,10 @@ const CuentaCard = ({ cuenta, actualiza, setActualiza, tipoAhorro }) => {
         navigate(
           `/history/cuenta/${cuenta.id}/`,
         )}>Historial</Button>
+        <Button color='success' onClick={()=>
+        navigate(
+          `/history/graficas/${cuenta.id}/`,
+        )}>Graficas</Button>
         <MovimientoModal cuenta_id={cuenta.id} actualiza={actualiza} setActualiza={setActualiza} origen={om_gasto} color="secondary" />
         <MovimientoModal cuenta_id={cuenta.id} actualiza={actualiza} setActualiza={setActualiza} origen={om_ingreso} color="primary" />
       </div>

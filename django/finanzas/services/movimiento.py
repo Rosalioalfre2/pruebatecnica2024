@@ -126,6 +126,31 @@ class MovimientoApi:
         
         return movimientos
     
+    def chartMovimientos(self):
+        movimientos = list(Movimiento.objects
+                        .filter(
+                            cuenta__id=self.cuenta.id,
+                            fecha__isnull=False,
+                            deleted_at__isnull=True
+                        )
+                        .annotate(
+                            tipo_movimiento_nombre=F('tipo_movimiento__nombre'),
+                            origen_id=F('tipo_movimiento__origen__id'),
+                            origen_nombre=F('tipo_movimiento__origen__nombre'),
+                        )
+                        .values(
+                            'fecha',
+                            'origen_id',
+                            'origen_nombre'
+                        )
+                        .annotate(
+                            cantidad=Sum('cantidad')
+                        )
+                        .order_by('fecha'))
+
+        return movimientos
+        
+    
     def listMovimientosPorSemana(self):
         movimientos = list(Movimiento.objects
                         .filter(
