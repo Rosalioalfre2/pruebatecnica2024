@@ -50,7 +50,7 @@ const TipoMovimientoContent = ({tipo="",origen=1}) => {
     items: [
       {
         fieldName: "nombre",
-        label: "Nombre del tipo de ahorro",
+        label: "Nombre",
         type: "name",
         required: true,
       },

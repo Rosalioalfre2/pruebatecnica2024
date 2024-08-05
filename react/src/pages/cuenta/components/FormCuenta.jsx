@@ -8,25 +8,9 @@ import { useEffect, useState } from "react";
 import { tm_cantidad, tm_fecha} from '@/const/finanzas'
 import { notify } from "@/components/toast";
 
-const getTipoAhorro = async () =>{
-  let result = [];
-  try {
-    const response = await axiosApi('/finanza/TipoAhorro/?op=select');
-    if (response.status === 200) {
-      if(response.data.results){
-        result = response.data.results
-      }
-    }
-  } catch (error) {
-    result = [];
-  }
-  return result;
-}
-
-const FormCuenta = ({ editar=false, cuenta=null, actualiza, setActualiza }) => {
+const FormCuenta = ({ editar=false, cuenta=null, actualiza, setActualiza, tipoAhorro }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
-  const [tipoAhorro, setTipoAhorro] = useState([]);
   const [tipoMeta, setTipoMeta] = useState(null);
 
   const handleClose = () => {
@@ -57,17 +41,6 @@ const FormCuenta = ({ editar=false, cuenta=null, actualiza, setActualiza }) => {
     }
     return result;
   };
-
-  useEffect(() => {
-    const fetchTipoAhorro = async () => {
-      let result = await getTipoAhorro();
-      if (Array.isArray(result)) {
-        setTipoAhorro(result);
-      }
-    };
-
-    fetchTipoAhorro();
-  }, []);
 
   useEffect(() => {
     const theTipoAhorro = tipoAhorro.find(tipo => tipo.id == watch('tipo_ahorro_id'));

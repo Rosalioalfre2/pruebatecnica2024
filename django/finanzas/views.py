@@ -190,3 +190,19 @@ class CuentasApiView(APIView):
             return JsonResponse(cuenta.addCuenta(self.request.data, user_id), safe=False)
         elif option == "deleteCuenta":
             return JsonResponse(cuenta.deleteCuenta(self.request.data, user_id), safe=False)
+        else:
+            alerta(errors=['Opcion no valida'])
+
+class MovimientoApiView(APIView):
+    def post(self, request):
+        from finanzas.services.movimiento import MovimientoApi
+        option = self.request.GET.get('op')
+        user_id = getPayloadJWT(self.request, "user_id")
+        cuenta_id = self.request.data.get('cuenta_id', None)
+        
+        cuenta = MovimientoApi( cuenta_id=cuenta_id, user_id=user_id)
+
+        if option == "registerMovimiento":
+            return JsonResponse(cuenta.registerMovimiento(data=self.request.data), safe=False)
+        else:
+            alerta(errors=['Opcion no valida'])
