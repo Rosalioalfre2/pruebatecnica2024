@@ -4,12 +4,15 @@ import { useParams } from "react-router-dom";
 import { axiosApi } from '@/libs/axios';
 import { useEffect, useState } from "react";
 import { notify } from "@/components/toast";
-import { tm_corriente, om_ingreso, om_gasto} from '@/const/finanzas'
-import {Container, Row, Col} from '../../components/ui/Index'
+import { tm_corriente, om_ingreso} from '@/const/finanzas'
+import {Container, Row, Col, NavTabs} from '../../components/ui/Index'
+import { FaCalendar, FaCalendarWeek, FaClock } from "react-icons/fa6";
 
 const CuentaHistorial = () =>{
   const { cuenta_id } = useParams();
   const [movimientos, setMovimientos] = useState([])
+  const [movimientosSemana, setMovimientosSemana] = useState([])
+  const [movimientosMes, setMovimientosMes] = useState([])
   const [cuenta, setCuenta] = useState({})
   
   const getCuentaHistorial = async () =>{
@@ -22,6 +25,44 @@ const CuentaHistorial = () =>{
       }
     } catch (error) {
       setMovimientos([])
+      if(error.response.status == 400 && error.response.data.errors){
+        notify(JSON.stringify(error.response.data.errors), 'error')
+      }
+      else{
+        notify('Ooops, algo salio mal, vuelva intentar.', 'error')
+      }
+    }
+  }
+  
+  const getCuentaHistorialWeek = async () =>{
+    try {
+      const response = await axiosApi.post('/finanza/api/movimiento?op=listMovimientosPorSemana', {cuenta_id});
+      if (response.status === 200) {
+        if(response.data){
+          setMovimientosSemana(response.data)
+        }
+      }
+    } catch (error) {
+      setMovimientosSemana([])
+      if(error.response.status == 400 && error.response.data.errors){
+        notify(JSON.stringify(error.response.data.errors), 'error')
+      }
+      else{
+        notify('Ooops, algo salio mal, vuelva intentar.', 'error')
+      }
+    }
+  }
+  
+  const getCuentaHistoriaMonth = async () =>{
+    try {
+      const response = await axiosApi.post('/finanza/api/movimiento?op=listMovimientosPorMes', {cuenta_id});
+      if (response.status === 200) {
+        if(response.data){
+          setMovimientosMes(response.data)
+        }
+      }
+    } catch (error) {
+      setMovimientosMes([])
       if(error.response.status == 400 && error.response.data.errors){
         notify(JSON.stringify(error.response.data.errors), 'error')
       }
@@ -53,7 +94,28 @@ const CuentaHistorial = () =>{
   useEffect(()=>{
     getCuentaHistorial();
     getCuenta();
+    getCuentaHistoriaMonth();
+    getCuentaHistorialWeek();
   },[])
+
+
+  const tabsItems = [
+    {
+      title: "Todos los movimientos",
+      icon: FaClock,
+      children: <CardMovimiento movimientos={movimientos} />,
+    },
+    {
+      title: "Movimiento por semana",
+      icon: FaCalendarWeek,
+      children: <CardMovimientoSemana movimientos={movimientosSemana} />,
+    },
+    {
+      title: "Movimiento por mes",
+      icon: FaCalendar,
+      children: <CardMovimientoMes movimientos={movimientosMes} />,
+    },
+  ];
   
   return (
     <Layout title="Historial de la cuenta">
@@ -78,7 +140,9 @@ const CuentaHistorial = () =>{
       <Container className="mt-4">
         <Row>
           <Col>{movimientos.length == 0 && <h3 className="text-2xl font-semibold text-center">No se ha registrado movimientos en esta cuenta</h3>}</Col>
-          <Col><CardMovimiento movimientos={movimientos} /></Col>
+          <Col>
+            <NavTabs items={tabsItems} />
+          </Col>
         </Row>
       </Container>
     </Layout>
@@ -99,6 +163,38 @@ const CardMovimiento = ({movimientos}) =>{
           <p className="text-2xl font-semibold">Cantidad: <span className="font-bold">${movimiento.cantidad}</span></p>
           <p className="text-xl font-semibold">Fecha: <span className="font-bold">{movimiento.fecha}</span></p>
           <p className="text-xl font-semibold">Razon: <span className="font-bold">{movimiento.tipo_movimiento_nombre}</span></p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const CardMovimientoSemana = ({movimientos}) =>{
+  return (
+    <div className="w-full flex flex-col">
+      {movimientos.map((movimiento, index)=>(
+        <div className={`mt-4 space-y-2 p-4 grid grid-cols-1 md:grid-cols-4 gap-2 rounded border-3 ${movimiento.origen_id == om_ingreso 
+          ? "bg-green-400 dark:bg-green-800 border-green-800 dark:border-green-600"
+          : "bg-red-400 dark:bg-red-800 border-red-800 dark:border-red-600" }`} key={index}>
+          <p className="text-2xl font-semibold text-center"><span className="font-bold">{movimiento.origen_nombre}</span></p>
+          <p className="text-2xl font-semibold">Cantidad: <span className="font-bold">${movimiento.total_cantidad}</span></p>
+          <p className="text-xl font-semibold">Semana: <span className="font-bold">{movimiento.semana_inicio} - {movimiento.semana_fin}</span></p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const CardMovimientoMes = ({movimientos}) =>{
+  return (
+    <div className="w-full flex flex-col">
+      {movimientos.map((movimiento, index)=>(
+        <div className={`mt-4 space-y-2 p-4 grid grid-cols-1 md:grid-cols-4 gap-2 rounded border-3 ${movimiento.origen_id == om_ingreso 
+          ? "bg-green-400 dark:bg-green-800 border-green-800 dark:border-green-600"
+          : "bg-red-400 dark:bg-red-800 border-red-800 dark:border-red-600" }`} key={index}>
+          <p className="text-2xl font-semibold text-center"><span className="font-bold">{movimiento.origen_nombre}</span></p>
+          <p className="text-2xl font-semibold">Cantidad: <span className="font-bold">${movimiento.total_cantidad}</span></p>
+          <p className="text-xl font-semibold">Mes: <span className="font-bold">{movimiento.inicio_mes} - {movimiento.fin_mes}</span></p>
         </div>
       ))}
     </div>

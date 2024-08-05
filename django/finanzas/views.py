@@ -208,5 +208,9 @@ class MovimientoApiView(APIView):
             return JsonResponse(cuenta.registerMovimiento(data=self.request.data), safe=False)
         elif option == "listMovimientos":
             return JsonResponse(cuenta.listMovimientos(), safe=False)
+        elif option == "listMovimientosPorSemana":
+            return JsonResponse(cuenta.listMovimientosPorSemana(), safe=False)
+        elif option == "listMovimientosPorMes":
+            return JsonResponse(cuenta.listMovimientosPorMes(), safe=False)
         else:
             alerta(errors=['Opcion no valida'])

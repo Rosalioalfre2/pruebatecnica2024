@@ -1,11 +1,13 @@
 from django.db import transaction, IntegrityError
-from django.db.models import F
+from django.db.models import F, Sum, Value, DateField, ExpressionWrapper
+from django.db.models.functions import TruncWeek, TruncMonth
 from finanzas.models import Ahorro, TipoMovimiento, Movimiento
 from core.helpers.alert import alerta
 import finanzas.const as finanza
 import decimal
 from datetime import date
-from datetime import datetime
+from datetime import datetime, timedelta
+from calendar import monthrange
 
 class MovimientoApi:
     
@@ -122,4 +124,58 @@ class MovimientoApi:
                            )
                            .order_by('-fecha'))
         
+        return movimientos
+    
+    def listMovimientosPorSemana(self):
+        movimientos = list(Movimiento.objects
+                        .filter(
+                            cuenta__id=self.cuenta.id,
+                            fecha__isnull=False,
+                            deleted_at__isnull=True
+                            )
+                        .annotate(
+                            origen_id=F('tipo_movimiento__origen__id'),
+                            origen_nombre=F('tipo_movimiento__origen__nombre'),
+                            semana_inicio=TruncWeek('fecha', output_field=DateField()),
+                            semana_fin=ExpressionWrapper(TruncWeek('fecha', output_field=DateField()) + timedelta(days=6), output_field=DateField())
+                        )
+                        .values(
+                            'semana_inicio',
+                            'semana_fin',
+                            'origen_id',
+                            'origen_nombre',
+                        )
+                        .annotate(
+                            total_cantidad=Sum('cantidad')
+                        )
+                        .order_by('-semana_inicio'))
+        return movimientos
+    
+    def listMovimientosPorMes(self):
+        movimientos = list(Movimiento.objects
+                        .filter(
+                            cuenta__id=self.cuenta.id,
+                            fecha__isnull=False,
+                            deleted_at__isnull=True
+                            )
+                        .annotate(
+                            origen_id=F('tipo_movimiento__origen__id'),
+                            origen_nombre=F('tipo_movimiento__origen__nombre'),
+                            inicio_mes=TruncMonth('fecha', output_field=DateField())
+                        )
+                        .values(
+                            'inicio_mes',
+                            'origen_id',
+                            'origen_nombre'
+                        )
+                        .annotate(
+                            total_cantidad=Sum('cantidad')
+                        )
+                        .order_by('-inicio_mes'))
+
+        for movimiento in movimientos:
+            inicio_mes = movimiento['inicio_mes']
+            fin_mes = date(inicio_mes.year, inicio_mes.month, monthrange(inicio_mes.year, inicio_mes.month)[1])
+            movimiento['fin_mes'] = fin_mes
+
         return movimientos
